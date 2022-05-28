@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+signal cursor_l_click
+signal cursor_r_click
+"
+
+[node name="SignalHub" type="Node2D"]
+script = SubResource( 1 )
