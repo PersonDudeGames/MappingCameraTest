@@ -1,26 +1,43 @@
 extends Camera2D
 
+var Direction = preload("res://Scripts/Direction.gd").Direction
+
 var _threshold := 24
 var _step := 4
 var _zoom_step := 0.1
 var events := {}
 var last_drag_distance := 0
 var zoom_sensitivity := 10
-onready var viewport_size = get_viewport().size
+var scroll_direction := 0
 
-func _process(delta: float) -> void:
-	var local_mouse_pos = get_local_mouse_position()
+onready var up_left = Direction.UP + Direction.LEFT
+onready var up_right = Direction.UP + Direction.RIGHT
+onready var down_left = Direction.DOWN + Direction.LEFT
+onready var down_right = Direction.DOWN + Direction.RIGHT
 
-	if local_mouse_pos.x < _threshold:
-		position.x -= _step
-	elif local_mouse_pos.x > viewport_size.x - _threshold:
-		position.x += _step
-		
-	if local_mouse_pos.y < _threshold:
-		position.y -= _step
-	elif local_mouse_pos.y > viewport_size.y - _threshold:
-		position.y += _step
-
+func _process(_delta: float) -> void:
+	match scroll_direction:
+		Direction.UP:
+			position.y -= _step
+		Direction.DOWN:
+			position.y += _step
+		Direction.LEFT:
+			position.x -= _step
+		Direction.RIGHT:
+			position.x += _step
+		up_left:
+			position.y -= _step
+			position.x -= _step
+		up_right:
+			position.y -= _step
+			position.x += _step
+		down_left:
+			position.y += _step
+			position.x -= _step
+		down_right:
+			position.y += _step
+			position.x += _step
+			
 func _zoom_in() -> void:
 	zoom.x = clamp(zoom.x - _zoom_step, 0.1, zoom.x)
 	zoom.y = clamp(zoom.y - _zoom_step, 0.1, zoom.y)
@@ -32,10 +49,8 @@ func _zoom_out() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("zoom_in"):
 		_zoom_in()
-		viewport_size = get_viewport().size
 	elif event.is_action_pressed("zoom_out"):
 		_zoom_out()
-		viewport_size = get_viewport().size
 	elif event is InputEventScreenTouch:
 		if event.is_pressed():
 			events[event.index] = event
@@ -53,3 +68,35 @@ func _unhandled_input(event: InputEvent) -> void:
 				else:
 					_zoom_in()
 				last_drag_distance = drag_distance
+
+
+func _on_Top_mouse_entered() -> void:
+	scroll_direction += Direction.UP
+
+
+func _on_Top_mouse_exited() -> void:
+	scroll_direction -= Direction.UP
+
+
+func _on_Right_mouse_entered() -> void:
+	scroll_direction += Direction.RIGHT
+
+
+func _on_Right_mouse_exited() -> void:
+	scroll_direction -= Direction.RIGHT
+
+
+func _on_Bottom_mouse_entered() -> void:
+	scroll_direction += Direction.DOWN
+
+
+func _on_Bottom_mouse_exited() -> void:
+	scroll_direction -= Direction.DOWN
+
+
+func _on_Left_mouse_entered() -> void:
+	scroll_direction += Direction.LEFT
+
+
+func _on_Left_mouse_exited() -> void:
+	scroll_direction -= Direction.LEFT
